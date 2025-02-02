@@ -26,7 +26,7 @@ namespace Cartao
         private void btnBradesco_Click(object sender, EventArgs e)
         {
             var textoPdf = PegarTexto();
-            if (!string.IsNullOrWhiteSpace(textoPdf)) ExtrairDadosDoTexto_Bradesco(textoPdf);
+            if (!string.IsNullOrWhiteSpace(textoPdf)) ExtrairDadosDoTexto_Bradesco2(textoPdf);
         }
 
         private void ExtrairDadosDoTexto_Itau2(string textoDoPdf)
@@ -37,44 +37,25 @@ namespace Cartao
             var dados_pdf = textoDoPdf.Split(palavraChave1)[1].Split(palavraChave2)[0].Split("\n", StringSplitOptions.RemoveEmptyEntries);
 
             var dados_tratados = dados_pdf.Select(Transformar).Where(o => o.E_Valido).ToList();
-            dados_tratados = dados_tratados.OrderBy(p => p.Data).ToList();
 
             StringBuilder sb = new StringBuilder();
             dados_tratados.ForEach(p => sb.AppendLine(p.ToString()));
             txtBox.Text = sb.ToString();
         }
 
-        private void ExtrairDadosDoTexto_Bradesco(string textoDoPdf)
+        private void ExtrairDadosDoTexto_Bradesco2(string textoDoPdf)
         {
+            string palavraChave1 = "Número do Cartão";
+            string palavraChave2 = "Pagamento mínimo desta fatura";
 
-            var texto_final = string.Empty;
-            List<string> dados_pdf = textoDoPdf.Split("-", StringSplitOptions.RemoveEmptyEntries).ToList();
-            string dado_interesse = dados_pdf[4].Split("Resumo das Despesas")[0];
-            List<string> dados_interesse = dado_interesse.Split("\n", StringSplitOptions.RemoveEmptyEntries).ToList();
+            var dados_pdf = textoDoPdf.Split(palavraChave1)[1].Split(palavraChave2)[0].Split("\n", StringSplitOptions.RemoveEmptyEntries);
 
-            foreach (var linha in dados_interesse)
-            {
-                if (linha.Contains("LUCIANA DA PENHA FERREIRA")) continue;
+            var dados_tratados = dados_pdf.Select(Transformar).Where(o => o.E_Valido).ToList();
 
-                if (linha.Length > 3 && linha[2] == '/')
-                {
-                    if (linha.Length < 6) continue;
-
-                    List<string> dados_linha = linha.Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList();
-                    string frase = dados_linha[0] + "\t";
-
-                    for (int i = 1; i < dados_linha.Count - 1; i++)
-                        frase += dados_linha[i] + " ";
-
-                    frase += "\t" + dados_linha[dados_linha.Count - 1];
-                    texto_final += frase + "\n";
-                }
-                else texto_final += linha + "\n";
-            }
-            txtBox.Text = texto_final;
-
+            StringBuilder sb = new StringBuilder();
+            dados_tratados.ForEach(p => sb.AppendLine(p.ToString()));
+            txtBox.Text = sb.ToString();
         }
-
 
         private string PegarTexto()
         {
@@ -157,6 +138,4 @@ namespace Cartao
             return $"{Data}\t{Nome}\t{Valor}";
         }
     }
-
-
 }
