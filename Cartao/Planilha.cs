@@ -34,7 +34,11 @@ namespace Cartao
             string palavraChave1 = "Pagamentos efetuados Lançamentos: compras e saques";
             string palavraChave2 = "Encargos cobrados nesta fatura";
 
-            var dados_pdf = textoDoPdf.Split(palavraChave1)[1].Split(palavraChave2)[0].Split("\n", StringSplitOptions.RemoveEmptyEntries);
+            var try1 = textoDoPdf.Split(palavraChave1);
+            var try2 = "";
+            if (try1.Length > 1) try2 = try1[1].Split(palavraChave2)[0];
+            else try2 = textoDoPdf.Split(palavraChave2)[0];
+            var dados_pdf = try2.Split("\n", StringSplitOptions.RemoveEmptyEntries);
 
             var dados_tratados = dados_pdf.Select(Transformar).Where(o => o.E_Valido).ToList();
 
